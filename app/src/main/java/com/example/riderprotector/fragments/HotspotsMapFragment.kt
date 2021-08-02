@@ -9,6 +9,8 @@ import Constants.button_enable
 import Constants.permission_request_message
 import Constants.permission_request_message2
 import Constants.permission_request_title
+import Permissions.hasLocationPermission
+import Permissions.requestLocationPermission
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -25,6 +27,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.riderprotector.R
 import com.example.riderprotector.util.LocationsUtil
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -37,11 +40,13 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.vmadalin.easypermissions.EasyPermissions
+import com.vmadalin.easypermissions.dialogs.SettingsDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-class HotspotsMapFragment : Fragment(),OnMapReadyCallback {
+class HotspotsMapFragment : Fragment(),OnMapReadyCallback , EasyPermissions.PermissionCallbacks{
 
     private lateinit var googleMap: GoogleMap
     private lateinit var supportMapFragment: SupportMapFragment
@@ -52,6 +57,10 @@ class HotspotsMapFragment : Fragment(),OnMapReadyCallback {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        //request location permission, override onRequestPermission result
+        if (!hasLocationPermission(requireContext())){
+            requestLocationPermission(this)
+        }
         //Initialize View
         var view = inflater.inflate(R.layout.fragment_hotspots_map,container,false)
         //Initialize Map Fragment
@@ -60,6 +69,27 @@ class HotspotsMapFragment : Fragment(),OnMapReadyCallback {
         supportMapFragment.getMapAsync(this)
         //return view
         return view
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode,permissions,grantResults,this)
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: List<String>) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this,perms)){
+            SettingsDialog.Builder(requireActivity()).build().show()
+        }else{
+            requestLocationPermission(this)
+        }
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: List<String>) {
+        Log.d("location_permission","permission granted!")
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
