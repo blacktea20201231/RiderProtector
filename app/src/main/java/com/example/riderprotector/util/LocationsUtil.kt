@@ -1,11 +1,11 @@
 package com.example.riderprotector.util
 
-import Constants.LOCATION_UPDATE_INTERVAL
-import Constants.PERMISSION_LOCATION_REQUEST_CODE
-import Constants.button_deny
-import Constants.button_enable
-import Constants.permission_request_message2
-import Constants.permission_request_title
+import com.example.riderprotector.util.Constants.LOCATION_UPDATE_INTERVAL
+import com.example.riderprotector.util.Constants.PERMISSION_LOCATION_REQUEST_CODE
+import com.example.riderprotector.util.Constants.button_deny
+import com.example.riderprotector.util.Constants.button_enable
+import com.example.riderprotector.util.Constants.permission_request_message2
+import com.example.riderprotector.util.Constants.permission_request_title
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
