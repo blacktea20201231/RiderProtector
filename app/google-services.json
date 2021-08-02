@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "259358234830",
+    "firebase_url": "https://riderprotector-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "riderprotector",
+    "storage_bucket": "riderprotector.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259358234830:android:6ebb17d624c3eccea5d89f",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "259358234830-mhoodohcnkpdhmp0gdiftgspug0etdfq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBc-RanutX1WlD7LlIFlMOCKBaqtVieUpo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "259358234830-mhoodohcnkpdhmp0gdiftgspug0etdfq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259358234830:android:7f7f4170ab760d16a5d89f",
+        "android_client_info": {
+          "package_name": "com.example.myapplication3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "259358234830-mhoodohcnkpdhmp0gdiftgspug0etdfq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBc-RanutX1WlD7LlIFlMOCKBaqtVieUpo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "259358234830-mhoodohcnkpdhmp0gdiftgspug0etdfq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259358234830:android:7d7317ea8d5baa5aa5d89f",
+        "android_client_info": {
+          "package_name": "com.example.riderprotector"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "259358234830-mhoodohcnkpdhmp0gdiftgspug0etdfq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBc-RanutX1WlD7LlIFlMOCKBaqtVieUpo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "259358234830-mhoodohcnkpdhmp0gdiftgspug0etdfq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
