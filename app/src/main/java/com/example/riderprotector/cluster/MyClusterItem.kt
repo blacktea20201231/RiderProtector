@@ -18,4 +18,6 @@ class MyClusterItem(lat: Double, lng: Double, private val title: String, private
     override fun getSnippet(): String? {
         return snippet
     }
+
+
 }

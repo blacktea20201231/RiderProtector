@@ -1,5 +1,7 @@
 package com.example.riderprotector.fragments
 
+import android.Manifest
+import android.content.pm.PackageManager
 import com.example.riderprotector.util.Constants.ZOOM_LEVEL_DEFAULT
 import com.example.riderprotector.util.Constants.ZOOM_LEVEL_MAP_START
 import com.example.riderprotector.util.Permissions.hasLocationPermission
@@ -10,6 +12,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.riderprotector.R
 import com.example.riderprotector.cluster.MyClusterItem
@@ -82,7 +85,26 @@ class HotspotsMapFragment : Fragment(),OnMapReadyCallback , EasyPermissions.Perm
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
+        //assign to google map var
         this.googleMap = googleMap
+        //enable location
+        if (context?.let {
+                ActivityCompat.checkSelfPermission(
+                    it,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            } != PackageManager.PERMISSION_GRANTED && context?.let {
+                ActivityCompat.checkSelfPermission(
+                    it,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            } != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestLocationPermission(this)
+            return
+        }
+        googleMap.isMyLocationEnabled = true
+
         //add item to cluster
         setUpClusterer()
         //basic UI settings
