@@ -22,7 +22,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -85,6 +84,7 @@ class HotspotsMapFragment : Fragment(),OnMapReadyCallback , EasyPermissions.Perm
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
+
         //assign to google map var
         this.googleMap = googleMap
         //enable location
