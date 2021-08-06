@@ -1,6 +1,7 @@
 package com.example.riderprotector.fragments
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.pm.PackageManager
 import com.example.riderprotector.util.Constants.ZOOM_LEVEL_DEFAULT
@@ -8,6 +9,7 @@ import com.example.riderprotector.util.Constants.ZOOM_LEVEL_MAP_START
 import com.example.riderprotector.util.Permissions.hasLocationPermission
 import com.example.riderprotector.util.Permissions.requestLocationPermission
 import android.os.Bundle
+import android.text.Editable
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -16,10 +18,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
+import com.example.riderprotector.HotspotsObject.Coordinate
+import com.example.riderprotector.HotspotsObject.Details
+import com.example.riderprotector.HotspotsObject.Hotspot
 import com.example.riderprotector.R
 import com.example.riderprotector.cluster.MyClusterItem
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -39,6 +42,8 @@ import com.vmadalin.easypermissions.EasyPermissions
 import com.vmadalin.easypermissions.dialogs.SettingsDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.PermissionCallbacks,
@@ -173,8 +178,7 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
                 for (i in snapshot.children) {
                     Log.d("Hotspots",
                         "Latitude:" + i.child("coordinate").child("latitude").value.toString()
-                            .toDouble()
-                    )
+                            .toDouble())
                     val offsetItem =
                         MyClusterItem(
                             i.child("coordinate").child("latitude").value.toString().toDouble(),
@@ -192,6 +196,12 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
         })
     }
 
+    private fun addNewItems(title: Editable, brief: Editable, p0: LatLng) {
+        clusterManager?.addItem(
+            MyClusterItem(p0.latitude, p0.longitude, title.toString(), brief.toString())
+        )
+    }
+    
     override fun onClusterClick(cluster: Cluster<MyClusterItem>?): Boolean {
         return true
     }
@@ -224,11 +234,33 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
             //test for the value get from user
             Log.d("Report","Title: $title")
             Log.d("Report","Brief: $brief")
+            uploadNewSpots(title,brief,p0)
+            dialog.cancel()
+
         }
-
-
-
     }
 
+    @SuppressLint("SimpleDateFormat")
+    private fun uploadNewSpots(title: Editable, brief: Editable, p0: LatLng) {
+        val hotspot = Hotspot(
+            Coordinate(p0.latitude,p0.longitude),
+            Details(
+                null,
+                brief.toString(),
+                SimpleDateFormat("dd-MM-yyyy HH:MM:SS").format(Date()),
+            null,
+            title.toString())
+        )
+        val key = ("${p0.latitude}+${p0.longitude}").replace('.', '_')
+        database.child(key).setValue(hotspot)
+            .addOnSuccessListener {
+            Log.d("firebase_database","hotspot added successfully")
+                addNewItems(title, brief, p0)
+                title.clear()
+                brief.clear()
 
+        }.addOnFailureListener{
+                Log.d("firebase_database","hotspot adding Failed: $it")
+        }
+    }
 }
