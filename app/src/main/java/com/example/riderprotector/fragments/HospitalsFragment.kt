@@ -148,6 +148,7 @@ class HospitalsFragment : Fragment(), OnMapReadyCallback,
         addMarkers(googleMap)
         googleMap.setOnInfoWindowClickListener(this)
         googleMap.setOnInfoWindowLongClickListener(this)
+//        googleMap.setOnMapLongClickListener(this)
 
     }
 

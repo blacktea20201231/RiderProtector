@@ -149,7 +149,6 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
         googleMap.setOnInfoWindowClickListener(this)
         googleMap.setOnInfoWindowLongClickListener(this)
         googleMap.setOnMapLongClickListener(this)
-
     }
 
     private fun moveMap(lat: Double, lng: Double) {

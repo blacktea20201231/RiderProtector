@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
                 R.id.garda_station_map_title-> replaceFragment(gardaStationMapFragment)
                 R.id.hospital_map_title-> replaceFragment(hospitalsFragment)
                 R.id.bike_shop_map_title->replaceFragment(bikeShopFragment)
-                R.id.account_page_title->replaceFragment(accountFragment)
             }
             true
         }

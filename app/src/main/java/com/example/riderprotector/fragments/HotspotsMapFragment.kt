@@ -47,17 +47,14 @@ import java.util.*
 
 
 class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.PermissionCallbacks,
-    ClusterManager.OnClusterClickListener<MyClusterItem>, GoogleMap.OnMarkerClickListener,
-    GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener {
+    ClusterManager.OnClusterClickListener<MyClusterItem>, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapLongClickListener {
 
 
     private lateinit var googleMap: GoogleMap
     private lateinit var supportMapFragment: SupportMapFragment
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private val dublin = LatLng(53.3498, -6.2603)
     private var database = FirebaseDatabase.getInstance().getReference("hotspots")
     private var clusterManager: ClusterManager<MyClusterItem>? = null
-    private lateinit var progressBar: ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -147,7 +144,7 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
             )
         }
         googleMap.setOnMapClickListener(this)
-        googleMap.setOnMapLongClickListener(this)
+//        googleMap.setOnMapLongClickListener(this)
     }
 
     private fun setUpClusterer() {
