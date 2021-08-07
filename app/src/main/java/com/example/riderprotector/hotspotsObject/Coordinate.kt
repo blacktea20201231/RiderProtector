@@ -1,4 +1,4 @@
-package com.example.riderprotector.HotspotsObject
+package com.example.riderprotector.hotspotsObject
 
 data class Coordinate(
     val latitude: Double,

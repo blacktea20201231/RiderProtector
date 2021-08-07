@@ -20,11 +20,11 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.riderprotector.HotspotsObject.Coordinate
-import com.example.riderprotector.HotspotsObject.Details
-import com.example.riderprotector.HotspotsObject.Hotspot
 import com.example.riderprotector.R
 import com.example.riderprotector.cluster.MyClusterItem
+import com.example.riderprotector.hotspotsObject.Coordinate
+import com.example.riderprotector.hotspotsObject.Details
+import com.example.riderprotector.hotspotsObject.Hotspot
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -197,6 +197,7 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
     }
 
     private fun addNewItems(title: Editable, brief: Editable, p0: LatLng) {
+        clusterManager = ClusterManager(context, googleMap)
         clusterManager?.addItem(
             MyClusterItem(p0.latitude, p0.longitude, title.toString(), brief.toString())
         )
@@ -234,14 +235,13 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
             //test for the value get from user
             Log.d("Report","Title: $title")
             Log.d("Report","Brief: $brief")
-            uploadNewSpots(title,brief,p0)
+            uploadNewSpots(title,brief,p0,dialog)
             dialog.cancel()
-
         }
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun uploadNewSpots(title: Editable, brief: Editable, p0: LatLng) {
+    private fun uploadNewSpots(title: Editable, brief: Editable, p0: LatLng,dialog: AlertDialog) {
         val hotspot = Hotspot(
             Coordinate(p0.latitude,p0.longitude),
             Details(
@@ -256,8 +256,9 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
             .addOnSuccessListener {
             Log.d("firebase_database","hotspot added successfully")
                 addNewItems(title, brief, p0)
-                title.clear()
-                brief.clear()
+                title?.clear()
+                brief?.clear()
+                dialog.dismiss()
 
         }.addOnFailureListener{
                 Log.d("firebase_database","hotspot adding Failed: $it")
