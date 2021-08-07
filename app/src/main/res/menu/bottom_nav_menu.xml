@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title="Hotspot"
+        android:id="@+id/hotspot_map_title"
+        android:icon="@drawable/ic_hotspot"
+        />
+    <item
+        android:title="Garda Station"
+        android:id="@+id/garda_station_map_title"
+        android:icon="@drawable/ic_garda_station"/>
+    <item
+        android:title="Hospital"
+        android:id="@+id/hospital_map_title"
+        android:icon="@drawable/ic_hospital"/>
+    <item
+        android:title="Bike Shop"
+        android:id="@+id/bike_shop_map_title"
+        android:icon="@drawable/ic_bikes_shop"/>
+    <item
+        android:title="Account"
+        android:id="@+id/account_page_title"
+        android:icon="@drawable/ic_account"/>
+</menu>

@@ -3,11 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.Account">
-
-    <TextView
+    tools:context=".fragments.BikeShopFragment">
+    <fragment
+        android:id="@+id/bike_shop_map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Account Fragment" />
-
+        android:layout_height="match_parent" />
 </FrameLayout>
