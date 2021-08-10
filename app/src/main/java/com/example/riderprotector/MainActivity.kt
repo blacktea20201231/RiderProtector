@@ -16,7 +16,6 @@ class MainActivity : AppCompatActivity() {
     private val hospitalsFragment = HospitalsFragment()
     private val gardaStationMapFragment = GardaStationMapBlankFragment()
     private val bikeShopFragment = BikeShopFragment()
-    private val accountFragment = Account()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

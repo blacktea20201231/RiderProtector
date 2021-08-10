@@ -17,7 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.riderprotector.R
@@ -26,6 +26,7 @@ import com.example.riderprotector.hotspotsObject.Coordinate
 import com.example.riderprotector.hotspotsObject.Details
 import com.example.riderprotector.hotspotsObject.Hotspot
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -47,13 +48,15 @@ import java.util.*
 
 
 class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.PermissionCallbacks,
-    ClusterManager.OnClusterClickListener<MyClusterItem>, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapLongClickListener {
+    ClusterManager.OnClusterClickListener<MyClusterItem>, GoogleMap.OnMarkerClickListener,
+    GoogleMap.OnMapLongClickListener {
 
 
     private lateinit var googleMap: GoogleMap
     private lateinit var supportMapFragment: SupportMapFragment
     private val dublin = LatLng(53.3498, -6.2603)
     private var database = FirebaseDatabase.getInstance().getReference("hotspots")
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var clusterManager: ClusterManager<MyClusterItem>? = null
 
     override fun onCreateView(
@@ -69,6 +72,8 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
         //Initialize Map Fragment
         supportMapFragment =
             childFragmentManager.findFragmentById(R.id.hotspot_map) as SupportMapFragment
+        //FusedLocationProviderClient initialize
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
         //Async Map
         supportMapFragment.getMapAsync(this)
         //return view
@@ -143,7 +148,6 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
                 null
             )
         }
-        googleMap.setOnMapClickListener(this)
 //        googleMap.setOnMapLongClickListener(this)
     }
 
@@ -163,19 +167,22 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
         // Point the map's listeners at the listeners implemented by the cluster manager.
         googleMap.setOnCameraIdleListener(clusterManager)
         googleMap.setOnMarkerClickListener(clusterManager)
+        googleMap.setOnMapLongClickListener(this)
 
         // Add cluster items (markers) to the cluster manager.
-        addItems()
+        addItemsFromCloud()
     }
 
     // add items onto the map, NOT　MARKERS!!!
-    private fun addItems() {
+    private fun addItemsFromCloud() {
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (i in snapshot.children) {
-                    Log.d("Hotspots",
+                    Log.d(
+                        "Hotspots",
                         "Latitude:" + i.child("coordinate").child("latitude").value.toString()
-                            .toDouble())
+                            .toDouble()
+                    )
                     val offsetItem =
                         MyClusterItem(
                             i.child("coordinate").child("latitude").value.toString().toDouble(),
@@ -199,7 +206,7 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
             MyClusterItem(p0.latitude, p0.longitude, title.toString(), brief.toString())
         )
     }
-    
+
     override fun onClusterClick(cluster: Cluster<MyClusterItem>?): Boolean {
         return true
     }
@@ -209,9 +216,9 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
         return false
     }
 
-    override fun onMapClick(p0: LatLng) {
-        Log.d("Hotpsots_map", "mapClicked $p0")
-    }
+//    override fun onMapClick(p0: LatLng) {
+//        Log.d("Hotpsots_map", "mapClicked $p0")
+//    }
 
     override fun onMapLongClick(p0: LatLng) {
         Log.d("Hotpsots_map", "map Long Clicked $p0")
@@ -228,37 +235,59 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
         val brief = view.findViewById<EditText>(R.id.report_brief).text
 
         val reportBTN = view.findViewById<Button>(R.id.btn_report)
-        reportBTN.setOnClickListener{
+        reportBTN.setOnClickListener {
             //test for the value get from user
-            Log.d("Report","Title: $title")
-            Log.d("Report","Brief: $brief")
-            uploadNewSpots(title,brief,p0,dialog)
-            dialog.cancel()
+            Log.d("Report", "Title: $title")
+            Log.d("Report", "Brief: $brief")
+
+            //content validation
+            if (title.toString().equals(null) || title.toString() == "") {
+                Log.d("hotspot_upload", "title empty!")
+                Toast.makeText(
+                    context,
+                    "Title cannot be empty! Please try Again.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else if (brief.toString().equals(null) || brief.toString() == "") {
+                Log.d("hotspot_upload", "brief empty!")
+                Toast.makeText(
+                    context,
+                    "Brief cannot be empty! Please try Again.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else if (!title.toString().equals(null) && title.toString() != ""
+                && !brief.toString().equals(null) && brief.toString() != ""
+            ) {
+                uploadNewSpots(title, brief, p0, dialog)
+                dialog.cancel()
+            }
         }
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun uploadNewSpots(title: Editable, brief: Editable, p0: LatLng,dialog: AlertDialog) {
+    private fun uploadNewSpots(title: Editable, brief: Editable, p0: LatLng, dialog: AlertDialog) {
         val hotspot = Hotspot(
-            Coordinate(p0.latitude,p0.longitude),
+            Coordinate(p0.latitude, p0.longitude),
             Details(
                 null,
                 brief.toString(),
                 SimpleDateFormat("dd-MM-yyyy HH:MM:SS").format(Date()),
-            null,
-            title.toString())
+                null,
+                title.toString()
+            )
         )
         val key = ("${p0.latitude}+${p0.longitude}").replace('.', '_')
+
         database.child(key).setValue(hotspot)
             .addOnSuccessListener {
-            Log.d("firebase_database","hotspot added successfully")
+                Log.d("firebase_database", "hotspot added successfully")
                 addNewItems(title, brief, p0)
                 title?.clear()
                 brief?.clear()
                 dialog.dismiss()
 
-        }.addOnFailureListener{
-                Log.d("firebase_database","hotspot adding Failed: $it")
-        }
+            }.addOnFailureListener {
+                Log.d("firebase_database", "hotspot adding Failed: $it")
+            }
     }
 }

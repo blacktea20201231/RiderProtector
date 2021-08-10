@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import com.example.riderprotector.util.Constants.ZOOM_LEVEL_DEFAULT
-import com.example.riderprotector.util.Constants.ZOOM_LEVEL_MAP_START
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
@@ -17,8 +16,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.lifecycleScope
 import com.example.riderprotector.R
 import com.example.riderprotector.addressObject.Coordinate
 import com.example.riderprotector.addressObject.Details
@@ -40,10 +39,10 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.vmadalin.easypermissions.EasyPermissions
 import com.vmadalin.easypermissions.dialogs.SettingsDialog
-import kotlinx.coroutines.launch
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -145,7 +144,7 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
         //move to current location
         val currentLocation = getDeviceLocation()
         Log.d("Current_Location_testing", currentLocation.toString())
-        addMarkers(googleMap)
+        addSpotsFromCloud(googleMap)
         googleMap.setOnInfoWindowClickListener(this)
         googleMap.setOnInfoWindowLongClickListener(this)
         googleMap.setOnMapLongClickListener(this)
@@ -296,7 +295,7 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
-    private fun addMarkers(googleMap: GoogleMap) {
+    private fun addSpotsFromCloud(googleMap: GoogleMap) {
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 try {
@@ -392,6 +391,32 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
+    private fun showReportDialog(title: Editable?, address: Editable?, phone: Editable?, p0: LatLng){
+        val view = View.inflate(context, R.layout.add_new_address_dialog, null)
+        val builder = AlertDialog.Builder(context).setView(view)
+        val dialog = builder.create()
+        dialog.show()
+
+        view.findViewById<EditText>(R.id.report_title).text = title
+        view.findViewById<EditText>(R.id.report_address).text = address
+        view.findViewById<EditText>(R.id.report_phone).text = phone
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.white)
+        val title2 = view.findViewById<EditText>(R.id.report_title).text
+        val address2 = view.findViewById<EditText>(R.id.report_address).text
+        val phone2 = view.findViewById<EditText>(R.id.report_phone).text
+
+        val reportBTN = view.findViewById<Button>(R.id.btn_report)
+        reportBTN.setOnClickListener {
+            //test for the value get from user
+            Log.d("Report", "Title: $title")
+            Log.d("Report", "Brief: $address")
+            Log.d("Report", "Brief: $phone")
+            uploadNewSpots(title2,address2,phone2,p0, dialog)
+            dialog.cancel()
+        }
+    }
+
     private fun uploadNewSpots(title: Editable?, address: Editable?, phone: Editable?, p0: LatLng, dialog: AlertDialog) {
         val gardaStation = GardaiSatation(
             Coordinate(p0.latitude,p0.longitude),
@@ -402,22 +427,52 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
                 title.toString()
             )
         )
-        val key = ("${p0.latitude}+${p0.longitude}").replace('.', '_')
-        database.child(key).setValue(gardaStation)
-            .addOnSuccessListener {
-                Log.d("firebase_database","address added successfully")
-                addNewMarker(googleMap,title,phone,p0)
-                title?.clear()
-                phone?.clear()
-                address?.clear()
-                dialog.dismiss()
-            }.addOnFailureListener{
-                Log.d("firebase_database","address add failed: $it")
-            }
 
+        //content validation
+        if (title.toString().equals(null)|| title.toString() == ""){
+            Log.d("hotspot_upload","title empty!")
+            Toast.makeText(context,"Title cannot be empty! Please try Again.", Toast.LENGTH_SHORT).show()
+            showReportDialog(title, address, phone, p0)
+        }else if(phone.toString().equals(null)|| phone.toString() == ""){
+            Log.d("hotspot_upload","phone empty!")
+            Toast.makeText(context,"Phone number cannot be empty! Please try Again.", Toast.LENGTH_SHORT).show()
+            showReportDialog(title, address, phone, p0)
+        }else if(address.toString().equals(null)|| address.toString() == ""){
+            Log.d("hotspot_upload","phone number empty!")
+            Toast.makeText(context,"Address cannot be empty! Please try Again.", Toast.LENGTH_SHORT).show()
+            showReportDialog(title, address, phone, p0)
+        }else if(!phone?.let { phoneNumberValid(it) }!!){
+            Log.d("hotspot_upload","phone number invalid!")
+            Toast.makeText(context,"Phone number you typed is invalid! Please try Again.", Toast.LENGTH_SHORT).show()
+            showReportDialog(title, address, phone, p0)
+        } else if (!title.toString().equals(null)&& title.toString() != ""
+            &&!address.toString().equals(null)&& address.toString() != ""
+            &&!phone.toString().equals(null)&& phone.toString() != ""
+            &&phoneNumberValid(phone)
+        ){
+            val key = ("${p0.latitude}+${p0.longitude}").replace('.', '_')
+            database.child(key).setValue(gardaStation)
+                .addOnSuccessListener {
+                    Log.d("firebase_database","new spot added successfully")
+                    addNewSpots(googleMap,title,phone,p0)
+                    title?.clear()
+                    phone?.clear()
+                    address?.clear()
+                    dialog.cancel()
+                }.addOnFailureListener{
+                    Log.d("firebase_database","address add failed: $it")
+                }
+        }
     }
 
-    private fun addNewMarker(googleMap: GoogleMap, title: Editable?, phone: Editable?, p0: LatLng) {
+    private fun phoneNumberValid(phone: Editable): Boolean {
+        val regExp = "^((13[0-9])|(15[^4])|(18[0-9])|(17[0-8])|(14[5-9])|(166)|(19[8,9])|)\\d{8}$"
+        val p = Pattern.compile(regExp)
+        val m = p.matcher(phone.toString())
+        return m.matches()
+    }
+
+    private fun addNewSpots(googleMap: GoogleMap, title: Editable?, phone: Editable?, p0: LatLng) {
         googleMap.addMarker(MarkerOptions()
             .title(title.toString())
             .snippet(phone.toString())
