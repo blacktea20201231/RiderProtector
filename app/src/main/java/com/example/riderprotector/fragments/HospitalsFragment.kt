@@ -21,7 +21,8 @@ import androidx.core.app.ActivityCompat
 import com.example.riderprotector.R
 import com.example.riderprotector.addressObject.Coordinate
 import com.example.riderprotector.addressObject.Details
-import com.example.riderprotector.addressObject.GardaiSatation
+import com.example.riderprotector.addressObject.Address
+import com.example.riderprotector.util.Constants
 import com.example.riderprotector.util.ImgUtil
 import com.example.riderprotector.util.ImgUtil.px
 import com.example.riderprotector.util.Permissions
@@ -151,37 +152,42 @@ class HospitalsFragment : Fragment(), OnMapReadyCallback,
 
     }
 
-    private fun moveMap(lat: Double, lng: Double) {
+        private fun moveMap(lat: Double, lng: Double) {
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 try {
-                    val list = mutableListOf<Double>()
+                    val list : MutableList<Double> = mutableListOf()
                     for (i in snapshot.children) {
                         Log.d(
                             "firebase_hospital",
                             "Title:${i.child("details").child("title").value.toString()}"
                         )
                         Log.d(
-                            "v",
+                            "firebase_hospital",
                             "latitude:${
                                 i.child("coordinate").child("latitude").value.toString()
                             }"
                         )
-                        var coordinateX =
+                        val coordinateX =
                             i.child("coordinate").child("latitude").value.toString().toDouble()
-                        var coordinateY =
+                        val coordinateY =
                             i.child("coordinate").child("longitude").value.toString().toDouble()
-                        var squareDistanceX = (lat-coordinateX).pow(2)
-                        var squareDistanceY = (lng-coordinateY).pow(2)
-                        val distance = sqrt(squareDistanceX +squareDistanceY)
+                        val squareDistanceX = (lat-coordinateX).pow(2)
+                        val squareDistanceY = (lng-coordinateY).pow(2)
+                        val distance = 111*sqrt(squareDistanceX +squareDistanceY)
                         list.add(distance)
                     }
                     var minValue = list[0]
+                    Log.d("distance_list",list[0].toString())
+                    for (i in 0..list.size){
+                        Log.d("distance_list",list[i].toString())
+                    }
                     for (i in list){
                         if (i.compareTo(minValue)<0){
                             minValue = i
                         }
                     }
+
                     for (i in snapshot.children) {
                         var coordinateX =
                             i.child("coordinate").child("latitude").value.toString().toDouble()
@@ -189,65 +195,57 @@ class HospitalsFragment : Fragment(), OnMapReadyCallback,
                             i.child("coordinate").child("longitude").value.toString().toDouble()
                         var squareDistanceX = (lat-coordinateX).pow(2)
                         var squareDistanceY = (lng-coordinateY).pow(2)
-                        val distance = sqrt(squareDistanceX +squareDistanceY)
+                        val distance = 111*sqrt(squareDistanceX +squareDistanceY)
                         if (distance == minValue){
                             Log.d("hospital_distance",minValue.toString())
-                            if (distance>0.1){
+                            if (distance>10){
                                 googleMap.animateCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        11f
+                                        Constants.ZOOM_LEVEL_1
                                     ),
                                     1000,
                                     null
                                 )
-                            }else if(distance<=0.1 && distance >0.05){
-                                googleMap.animateCamera(
+                            }else if(distance<=10 && distance >5){
+                                googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        12f
-                                    ),
-                                    1000,
-                                    null
+                                        Constants.ZOOM_LEVEL_2
+                                    )
                                 )
-                            }else if(distance<=0.05 && distance >0.01){
-                                googleMap.animateCamera(
+                            }else if(distance<=5 && distance >1){
+                                googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        13f
+                                        Constants.ZOOM_LEVEL_3
                                     ),
-                                    1000,
-                                    null
                                 )
-                            }else if(distance<=0.01 && distance >0.005){
-                                googleMap.animateCamera(
+                            }else if(distance<=1 && distance >0.5){
+                                googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        14f
+                                        Constants.ZOOM_LEVEL_4
                                     ),
-                                    1000,
-                                    null
                                 )
                             }else{
-                                googleMap.animateCamera(
+                                googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        16f
+                                        Constants.ZOOM_LEVEL_5
                                     ),
-                                    1000,
-                                    null
                                 )
                             }
                         }
                     }
 
                 } catch (e: Exception) {
-                    Log.d("firebase_firebase_hospital", e.message.toString())
+                    Log.d("firebase_hospital", e.message.toString())
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.d("firebase_firebase_hospital_cancel", error.message)
+                Log.d("firebase_hospital_cancel", error.message)
             }
         })
     }
@@ -419,7 +417,7 @@ class HospitalsFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun uploadNewSpots(title: Editable?, address: Editable?, phone: Editable?, p0: LatLng, dialog: AlertDialog) {
-        val gardaStation = GardaiSatation(
+        val gardaStation = Address(
             Coordinate(p0.latitude,p0.longitude),
             Details(
                 address.toString(),

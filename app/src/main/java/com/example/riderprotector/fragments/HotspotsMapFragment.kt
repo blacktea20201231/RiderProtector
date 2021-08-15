@@ -141,7 +141,7 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
         lifecycleScope.launch {
             //location, zoom level
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dublin, ZOOM_LEVEL_MAP_START))
-            delay(1500)
+            delay(2000)
             googleMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(dublin, 15f),
                 1000,

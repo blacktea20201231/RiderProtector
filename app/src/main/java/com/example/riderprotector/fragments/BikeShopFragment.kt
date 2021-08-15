@@ -21,7 +21,8 @@ import androidx.core.app.ActivityCompat
 import com.example.riderprotector.R
 import com.example.riderprotector.addressObject.Coordinate
 import com.example.riderprotector.addressObject.Details
-import com.example.riderprotector.addressObject.GardaiSatation
+import com.example.riderprotector.addressObject.Address
+import com.example.riderprotector.util.Constants
 import com.example.riderprotector.util.ImgUtil
 import com.example.riderprotector.util.ImgUtil.px
 import com.example.riderprotector.util.Permissions
@@ -157,7 +158,7 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
                     val list = mutableListOf<Double>()
                     for (i in snapshot.children) {
                         Log.d(
-                            "firebase_hospital",
+                            "firebase_gardai_station",
                             "Title:${i.child("details").child("title").value.toString()}"
                         )
                         Log.d(
@@ -172,7 +173,7 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
                             i.child("coordinate").child("longitude").value.toString().toDouble()
                         var squareDistanceX = (lat-coordinateX).pow(2)
                         var squareDistanceY = (lng-coordinateY).pow(2)
-                        val distance = sqrt(squareDistanceX +squareDistanceY)
+                        val distance = 111*sqrt(squareDistanceX +squareDistanceY)
                         list.add(distance)
                     }
                     var minValue = list[0]
@@ -188,65 +189,57 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
                             i.child("coordinate").child("longitude").value.toString().toDouble()
                         var squareDistanceX = (lat-coordinateX).pow(2)
                         var squareDistanceY = (lng-coordinateY).pow(2)
-                        val distance = sqrt(squareDistanceX +squareDistanceY)
+                        var distance = 111*sqrt(squareDistanceX +squareDistanceY)
                         if (distance == minValue){
-                            Log.d("hospital_distance",minValue.toString())
-                            if (distance>0.1){
+                            Log.d("bike_shop_distance",minValue.toString())
+                            if (distance>10){
                                 googleMap.animateCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        11f
+                                        Constants.ZOOM_LEVEL_1
                                     ),
                                     1000,
                                     null
                                 )
-                            }else if(distance<=0.1 && distance >0.05){
-                                googleMap.animateCamera(
+                            }else if(distance<=10 && distance >5){
+                                googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        12f
-                                    ),
-                                    1000,
-                                    null
+                                        Constants.ZOOM_LEVEL_2
+                                    )
                                 )
-                            }else if(distance<=0.05 && distance >0.01){
-                                googleMap.animateCamera(
+                            }else if(distance<=5 && distance >1){
+                                googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        13f
+                                        Constants.ZOOM_LEVEL_3
                                     ),
-                                    1000,
-                                    null
                                 )
-                            }else if(distance<=0.01 && distance >0.005){
-                                googleMap.animateCamera(
+                            }else if(distance<=1 && distance >0.5){
+                                googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        14f
+                                        Constants.ZOOM_LEVEL_4
                                     ),
-                                    1000,
-                                    null
                                 )
                             }else{
-                                googleMap.animateCamera(
+                                googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        16f
+                                        Constants.ZOOM_LEVEL_5
                                     ),
-                                    1000,
-                                    null
                                 )
                             }
                         }
                     }
 
                 } catch (e: Exception) {
-                    Log.d("firebase_firebase_hospital", e.message.toString())
+                    Log.d("firebase_bike_shop_station", e.message.toString())
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.d("firebase_firebase_hospital_cancel", error.message)
+                Log.d("firebase_bike_shop_cancel", error.message)
             }
         })
     }
@@ -418,7 +411,7 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
     }
 
     private fun uploadNewSpots(title: Editable?, address: Editable?, phone: Editable?, p0: LatLng, dialog: AlertDialog) {
-        val gardaStation = GardaiSatation(
+        val gardaStation = Address(
             Coordinate(p0.latitude,p0.longitude),
             Details(
                 address.toString(),

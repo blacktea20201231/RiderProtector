@@ -16,11 +16,9 @@ object Permissions {
     fun requestLocationPermission(fragment: Fragment){
         EasyPermissions.requestPermissions(
             fragment,
-            "This application cannot work without Location Permission",
+            "Core functionality will not be working without accessing the device location.",
             PERMISSION_LOCATION_REQUEST_CODE,
             Manifest.permission.ACCESS_FINE_LOCATION
         )
     }
-
-
 }

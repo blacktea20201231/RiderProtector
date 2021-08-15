@@ -24,7 +24,12 @@ import androidx.lifecycle.lifecycleScope
 import com.example.riderprotector.R
 import com.example.riderprotector.addressObject.Coordinate
 import com.example.riderprotector.addressObject.Details
-import com.example.riderprotector.addressObject.GardaiSatation
+import com.example.riderprotector.addressObject.Address
+import com.example.riderprotector.util.Constants.ZOOM_LEVEL_1
+import com.example.riderprotector.util.Constants.ZOOM_LEVEL_2
+import com.example.riderprotector.util.Constants.ZOOM_LEVEL_3
+import com.example.riderprotector.util.Constants.ZOOM_LEVEL_4
+import com.example.riderprotector.util.Constants.ZOOM_LEVEL_5
 import com.example.riderprotector.util.ImgUtil.getBitmapDescriptor
 import com.example.riderprotector.util.ImgUtil.px
 import com.google.android.gms.location.*
@@ -178,7 +183,7 @@ class GardaStationMapBlankFragment : Fragment(), OnMapReadyCallback,
                             i.child("coordinate").child("longitude").value.toString().toDouble()
                         var squareDistanceX = (lat-coordinateX).pow(2)
                         var squareDistanceY = (lng-coordinateY).pow(2)
-                        val distance = sqrt(squareDistanceX +squareDistanceY)
+                        var distance = 111*sqrt(squareDistanceX +squareDistanceY)
                         list.add(distance)
                     }
                     var minValue = list[0]
@@ -194,53 +199,45 @@ class GardaStationMapBlankFragment : Fragment(), OnMapReadyCallback,
                             i.child("coordinate").child("longitude").value.toString().toDouble()
                         var squareDistanceX = (lat-coordinateX).pow(2)
                         var squareDistanceY = (lng-coordinateY).pow(2)
-                        val distance = sqrt(squareDistanceX +squareDistanceY)
+                        val distance = 111*sqrt(squareDistanceX +squareDistanceY)
                         if (distance == minValue){
                             Log.d("gardai_station_distance",minValue.toString())
-                            if (distance>0.1){
+                            if (distance>10){
                                 googleMap.animateCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        11f
+                                        ZOOM_LEVEL_1
                                     ),
                                     1000,
                                     null
                                 )
-                            }else if(distance<=0.1 && distance >0.05){
-                                googleMap.animateCamera(
+                            }else if(distance<=10 && distance >5){
+                                googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        12f
-                                    ),
-                                    1000,
-                                    null
+                                        ZOOM_LEVEL_2
+                                    )
                                 )
-                            }else if(distance<=0.05 && distance >0.01){
-                                googleMap.animateCamera(
+                            }else if(distance<=5 && distance >1){
+                                googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        13f
+                                        ZOOM_LEVEL_3
                                     ),
-                                    1000,
-                                    null
                                 )
-                            }else if(distance<=0.01 && distance >0.005){
-                                googleMap.animateCamera(
+                            }else if(distance<=1 && distance >0.5){
+                                googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        14f
+                                        ZOOM_LEVEL_4
                                     ),
-                                    1000,
-                                    null
                                 )
                             }else{
-                                googleMap.animateCamera(
+                                googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
-                                        16f
+                                        ZOOM_LEVEL_5
                                     ),
-                                    1000,
-                                    null
                                 )
                             }
                         }
@@ -425,7 +422,7 @@ class GardaStationMapBlankFragment : Fragment(), OnMapReadyCallback,
 
 
     private fun uploadNewSpots(title: Editable?, address: Editable?, phone: Editable?, p0: LatLng, dialog: AlertDialog) {
-        val gardaStation = GardaiSatation(
+        val gardaStation = Address(
             Coordinate(p0.latitude,p0.longitude),
             Details(
                 address.toString(),

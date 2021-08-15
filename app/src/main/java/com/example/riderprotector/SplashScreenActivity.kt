@@ -1,4 +1,4 @@
-    package com.example.riderprotector
+package com.example.riderprotector
 
 import android.content.Context
 import android.content.Intent
@@ -9,18 +9,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-    class SplashScreenActivity : AppCompatActivity() {
-
-
+class SplashScreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
 
         lifecycleScope.launch {
-            delay(6000)
-            val intent = Intent(this@SplashScreenActivity,MainActivity::class.java)
-            startActivity(intent)
-
+            delay(6000) // 6 sec duration for the animation to finish
+            val intent = Intent(this@SplashScreenActivity, MainActivity::class.java)
+            startActivity(intent) // redirect to mainActivity
         }
     }
 }
+

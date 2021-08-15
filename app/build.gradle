@@ -57,7 +57,7 @@ dependencies {
     // Fused Location
     implementation 'com.google.android.gms:play-services-location:18.0.0'
 
-    // Easy com.example.riderprotector.util.Permissions
+    // Easy Permission  com.example.riderprotector.util.Permissions
     implementation 'com.vmadalin:easypermissions-ktx:1.0.0'
 
     // Navigation Component

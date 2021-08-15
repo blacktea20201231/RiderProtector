@@ -1,6 +1,6 @@
 package com.example.riderprotector.addressObject
 
-data class GardaiSatation(
+data class Address(
     val coordinate: Coordinate,
     val details: Details
 )
