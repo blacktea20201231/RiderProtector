@@ -1,5 +1,7 @@
 package com.example.riderprotector.util
 
+import com.google.android.gms.maps.model.LatLng
+
 object Constants {
     const val button_deny = "Deny"
     const val button_enable = "Enable"
@@ -18,4 +20,7 @@ object Constants {
     const val ZOOM_LEVEL_5 = 16f
     const val REQUEST_PHONE_PERMISSION = 30303
     const val SPLASH_DISPLAY_LENGTH = 5000
+    const val DATAPATH_GARDA_STATION = "gardai_station"
+    const val DATAPATH_BIKE_SHOP = "bike_shop"
+    var dublin = LatLng(53.3498, -6.2603)
 }

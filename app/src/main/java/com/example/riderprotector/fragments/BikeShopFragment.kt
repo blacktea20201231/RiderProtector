@@ -18,11 +18,15 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.riderprotector.R
 import com.example.riderprotector.addressObject.Coordinate
 import com.example.riderprotector.addressObject.Details
 import com.example.riderprotector.addressObject.Address
 import com.example.riderprotector.util.Constants
+import com.example.riderprotector.util.Constants.DATAPATH_BIKE_SHOP
+import com.example.riderprotector.util.Constants.ZOOM_LEVEL_MAP_START
+import com.example.riderprotector.util.Constants.dublin
 import com.example.riderprotector.util.ImgUtil
 import com.example.riderprotector.util.ImgUtil.px
 import com.example.riderprotector.util.Permissions
@@ -40,6 +44,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.vmadalin.easypermissions.EasyPermissions
 import com.vmadalin.easypermissions.dialogs.SettingsDialog
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
@@ -54,7 +60,6 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
     private lateinit var googleMap: GoogleMap
     private lateinit var supportMapFragment: SupportMapFragment
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private val dublin = LatLng(53.3498, -6.2603)
     private var database = FirebaseDatabase.getInstance().getReference("bike_shop")
 
     override fun onCreateView(
@@ -132,7 +137,11 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
 
 //        googleMap.addMarker(MarkerOptions().title("testing Marker").position(dublin))
 
+        //retrieve spots from firebase and add to the map
+        addSpotsFromCloud(googleMap)
 //        lifecycleScope.launch {
+//
+//            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dublin, ZOOM_LEVEL_MAP_START))
 //            delay(2500)
 //            googleMap.animateCamera(
 //                CameraUpdateFactory.newLatLngZoom(dublin, ZOOM_LEVEL_DEFAULT),
@@ -145,7 +154,6 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
         //move to current location
         val currentLocation = getDeviceLocation()
         Log.d("Current_Location_testing", currentLocation.toString())
-        addSpotsFromCloud(googleMap)
         googleMap.setOnInfoWindowClickListener(this)
         googleMap.setOnInfoWindowLongClickListener(this)
         googleMap.setOnMapLongClickListener(this)
@@ -197,9 +205,7 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
                                         Constants.ZOOM_LEVEL_1
-                                    ),
-                                    1000,
-                                    null
+                                    )
                                 )
                             }else if(distance<=10 && distance >5){
                                 googleMap.moveCamera(
@@ -213,21 +219,21 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
                                         Constants.ZOOM_LEVEL_3
-                                    ),
+                                    )
                                 )
                             }else if(distance<=1 && distance >0.5){
                                 googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
                                         Constants.ZOOM_LEVEL_4
-                                    ),
+                                    )
                                 )
                             }else{
                                 googleMap.moveCamera(
                                     CameraUpdateFactory.newLatLngZoom(
                                         LatLng(lat,lng),
                                         Constants.ZOOM_LEVEL_5
-                                    ),
+                                    )
                                 )
                             }
                         }
@@ -444,7 +450,7 @@ class BikeShopFragment : Fragment(), OnMapReadyCallback,
             &&phoneNumberValid(phone)
         ){
             val key = ("${p0.latitude}+${p0.longitude}").replace('.', '_')
-            database.child(key).setValue(gardaStation)
+            database.child(key).setValue(DATAPATH_BIKE_SHOP)
                 .addOnSuccessListener {
                     Log.d("firebase_database","new spot added successfully")
                     addNewSpots(googleMap,title,phone,p0)

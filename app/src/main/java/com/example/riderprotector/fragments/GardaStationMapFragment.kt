@@ -25,11 +25,14 @@ import com.example.riderprotector.R
 import com.example.riderprotector.addressObject.Coordinate
 import com.example.riderprotector.addressObject.Details
 import com.example.riderprotector.addressObject.Address
+import com.example.riderprotector.util.Constants.DATAPATH_GARDA_STATION
 import com.example.riderprotector.util.Constants.ZOOM_LEVEL_1
 import com.example.riderprotector.util.Constants.ZOOM_LEVEL_2
 import com.example.riderprotector.util.Constants.ZOOM_LEVEL_3
 import com.example.riderprotector.util.Constants.ZOOM_LEVEL_4
 import com.example.riderprotector.util.Constants.ZOOM_LEVEL_5
+import com.example.riderprotector.util.Constants.dublin
+import com.example.riderprotector.util.ImgUtil
 import com.example.riderprotector.util.ImgUtil.getBitmapDescriptor
 import com.example.riderprotector.util.ImgUtil.px
 import com.google.android.gms.location.*
@@ -61,8 +64,7 @@ class GardaStationMapBlankFragment : Fragment(), OnMapReadyCallback,
     private lateinit var googleMap: GoogleMap
     private lateinit var supportMapFragment: SupportMapFragment
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private val dublin = LatLng(53.3498, -6.2603)
-    private var database = FirebaseDatabase.getInstance().getReference("gardai_satation")
+    private var database = FirebaseDatabase.getInstance().getReference(DATAPATH_GARDA_STATION)
 
 
     override fun onCreateView(
@@ -157,7 +159,7 @@ class GardaStationMapBlankFragment : Fragment(), OnMapReadyCallback,
         addSpotsFromCloud(googleMap)
         googleMap.setOnInfoWindowClickListener(this)
         googleMap.setOnInfoWindowLongClickListener(this)
-        googleMap.setOnMapLongClickListener(this)
+//        googleMap.setOnMapLongClickListener(this)
 
     }
 
@@ -303,16 +305,16 @@ class GardaStationMapBlankFragment : Fragment(), OnMapReadyCallback,
             override fun onDataChange(snapshot: DataSnapshot) {
                 try {
                     Log.d(
-                        "firebase_gardai_station",
+                        "firebase_garda_station",
                         "Testing:${snapshot.child("0").child("testing").value.toString()}"
                     )
                     for (i in snapshot.children) {
                         Log.d(
-                            "firebase_gardai_station",
+                            "firebase_garda_station",
                             "Title:${i.child("details").child("title").value.toString()}"
                         )
                         Log.d(
-                            "firebase_gardai_station",
+                            "firebase_garda_station",
                             "latitude:${
                                 i.child("coordinate").child("latitude").value.toString()
                             }"
@@ -322,12 +324,12 @@ class GardaStationMapBlankFragment : Fragment(), OnMapReadyCallback,
                                 .title(i.child("details").child("title").value.toString())
                                 .snippet(i.child("details").child("phone").value.toString())
                                 .icon(
-                                        getBitmapDescriptor(
-                                            context!!,
-                                            R.drawable.ic_garda_station,
-                                            60.px,
-                                            60.px
-                                        )
+                                    ImgUtil.getBitmapDescriptor(
+                                        context!!,
+                                        R.drawable.ic_garda_station,
+                                        60.px,
+                                        60.px
+                                    )
                                 )
                                 .position(
                                     LatLng(
@@ -340,12 +342,12 @@ class GardaStationMapBlankFragment : Fragment(), OnMapReadyCallback,
                         )
                     }
                 } catch (e: Exception) {
-                    Log.d("firebase_gardai_station", e.message.toString())
+                    Log.d("firebase_garda_station", e.message.toString())
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.d("firebase_gardai_station", error.message)
+                Log.d("firebase_garda_station", error.message)
             }
         })
     }

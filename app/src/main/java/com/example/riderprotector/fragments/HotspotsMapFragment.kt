@@ -1,4 +1,4 @@
-package com.example.riderprotector.fragments
+    package com.example.riderprotector.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -78,6 +78,8 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
         supportMapFragment.getMapAsync(this)
         //return view
         return view
+
+
     }
 
     override fun onRequestPermissionsResult(
@@ -143,7 +145,7 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(dublin, ZOOM_LEVEL_MAP_START))
             delay(2000)
             googleMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(dublin, 15f),
+                CameraUpdateFactory.newLatLngZoom(dublin, ZOOM_LEVEL_DEFAULT),
                 1000,
                 null
             )
@@ -225,7 +227,7 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
         showReportDialog(p0)
     }
 
-    private fun showReportDialog(p0: LatLng) {
+    private fun showReportDialog(latLng: LatLng) {
         val view = View.inflate(context, R.layout.report_dialog, null)
         val builder = AlertDialog.Builder(context).setView(view)
         val dialog = builder.create()
@@ -258,7 +260,8 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
             } else if (!title.toString().equals(null) && title.toString() != ""
                 && !brief.toString().equals(null) && brief.toString() != ""
             ) {
-                uploadNewSpots(title, brief, p0, dialog)
+                uploadNewSpots(title, brief, latLng, dialog)
+                addNewItems(title,brief,latLng)
                 dialog.cancel()
             }
         }
@@ -288,6 +291,6 @@ class HotspotsMapFragment : Fragment(), OnMapReadyCallback, EasyPermissions.Perm
 
             }.addOnFailureListener {
                 Log.d("firebase_database", "hotspot adding Failed: $it")
-            }
+        }
     }
 }
