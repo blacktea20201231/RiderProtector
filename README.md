@@ -1,7 +1,5 @@
 # RiderProtector
 A mobile application to keep food delivery riders from danger and get instant assistance.  
-Final project for the Higher Diploma in Science in Computing at National College of Ireland with 2 months development time.  
-Improvements ongoing...
 
 ## Features
 🔥 A Map with markers on top, added with clustering utility, revealing incidents on the road reported by the user.  
